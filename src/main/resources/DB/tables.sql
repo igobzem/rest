@@ -6,3 +6,4 @@ CREATE TABLE PERSON (
         PRIMARY KEY ( ID )
         );
 
+create sequence seq_person;

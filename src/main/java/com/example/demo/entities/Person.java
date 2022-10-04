@@ -1,25 +1,31 @@
 package com.example.demo.entities;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
+@Table(name="Person")
 public class Person {
 
-    private @Id @GeneratedValue Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gen_person")
+    @SequenceGenerator(name="gen_person", sequenceName = "seq_person", allocationSize = 1)
+    @Column(name = "id", updatable = false, nullable = false)
+    private Long id;
     private String firstName;
     private String lastName;
-    private String eMail;
+    private String email;
 
     public Person() {
     }
 
-    public Person(String firstName, String lastName, String eMail) {
+    public Person(String firstName, String lastName, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.eMail = eMail;
+        this.email = email;
     }
 
     public Long getId() {
@@ -46,25 +52,13 @@ public class Person {
         this.lastName = lastName;
     }
 
-    public String geteMail() {
-        return eMail;
+    @Column(name="email", length=45)
+    public String getEmail() {
+        return email;
     }
 
-    public void seteMail(String eMail) {
-        this.eMail = eMail;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Person person = (Person) o;
-        return Objects.equals(id, person.id) && Objects.equals(firstName, person.firstName) && Objects.equals(lastName, person.lastName) && Objects.equals(eMail, person.eMail);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, firstName, lastName, eMail);
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     @Override
@@ -73,7 +67,7 @@ public class Person {
                 "id=" + id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
-                ", eMail='" + eMail + '\'' +
+                ", eMail='" + email + '\'' +
                 '}';
     }
 }
