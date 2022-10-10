@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import com.example.demo.entities.Person;
+import com.example.demo.entities.PersonModelAssembler;
 import com.example.demo.entities.PersonRepository;
 import com.example.demo.exceptions.PersonNotFoundException;
 import org.springframework.hateoas.CollectionModel;
@@ -21,24 +22,23 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class Controller {
 
     private final PersonRepository repository;
+    private final PersonModelAssembler assembler;
 
-    Controller(PersonRepository repository) {
+    Controller(PersonRepository repository, PersonModelAssembler assembler) {
         this.repository = repository;
+        this.assembler = assembler;
     }
 
     @GetMapping("/person/get/{id}")
     public EntityModel<Person> one(@PathVariable Long id) {
         Person person = repository.findById(id).orElseThrow(() -> new PersonNotFoundException(id));
-        return EntityModel.of(person,
-                linkTo(methodOn(Controller.class).one(id)).withSelfRel(),
-                linkTo(methodOn(Controller.class).all()).withRel("persons"));
+        return assembler.toModel(person);
     }
 
     @GetMapping("/persons")
     public CollectionModel<EntityModel<Person>> all() {
-        List<EntityModel<Person>> persons = repository.findAll().stream().map(
-                person -> EntityModel.of(person, linkTo(methodOn(Controller.class).all())
-                        .withRel("persons"))).collect(Collectors.toList());
+        List<EntityModel<Person>> persons = repository.findAll().stream().map(assembler::toModel)
+            .collect(Collectors.toList());
         return CollectionModel.of(persons, linkTo(methodOn(Controller.class).all()).withSelfRel());
     }
 
